@@ -1,22 +1,16 @@
 import os
-print(1)
 import pickle
-print(2)
 import numpy as np
 import random
 import tensorflow as tf
-print(3)
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-print(4)
 import matplotlib.mlab as mlab
-print(5)
 import seaborn
-print(6)
+
+os.environ['CUDA_VISIBLE_DEVICES']='0'
 from PIL import Image, ImageColor
-print(7)
 from collections import namedtuple
-print("adafdsfasdaffffffffffffffffffffffffffffffffffsdfasdfas")
 class HandwrittenTextGenerator(object):
     @classmethod
     def __sample(cls, e, mu1, mu2, std1, std2, rho):
@@ -127,9 +121,7 @@ class HandwrittenTextGenerator(object):
         with open(os.path.join('handwritten_model', 'translation.pkl'), 'rb') as file:
             translation = pickle.load(file)
 
-        config = tf.ConfigProto(
-            device_count={'GPU': 0}
-        )
+        config = tf.ConfigProto(log_device_placement=True, allow_soft_placement=True)
         tf.reset_default_graph()
         with tf.Session(config=config) as sess:
             saver = tf.train.import_meta_graph('handwritten_model/model-29.meta')
