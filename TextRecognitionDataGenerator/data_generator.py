@@ -39,7 +39,7 @@ class FakeTextDataGenerator(object):
         addChar = charList[random.randint(0, 8)]
         if orientation == 1:
             raise ValueError("Vertical handwritten text is unavilable!")
-        imgHandWritten = HandwrittenTextGenerator.generate("(" + addChar + ")", text_color)
+        imgHandWritten = HandwrittenTextGenerator.generate("( " + addChar + " )", text_color)
         imgList.append(imgHandWritten)
 
         imageLast = ComputerTextGenerator.generate(text[statusIndex:], font, text_color, size, orientation, space_width)
