@@ -27,12 +27,36 @@ class FakeTextDataGenerator(object):
         ##########################
         # Create picture of text #
         ##########################
-        if is_handwritten:
-            if orientation == 1:
-                raise ValueError("Vertical handwritten text is unavailable")
-            image = HandwrittenTextGenerator.generate(text, text_color)
-        else:
-            image = ComputerTextGenerator.generate(text, font, text_color, size, orientation, space_width)
+
+        ##新建状态栏：表明具体添加的位置
+        statusIndex = random.randint(0, len(text))
+        charList = ['a', 'b', 'c', 'd', 'A', 'B', 'C', 'D']
+        imgList = []
+
+        imageFirst = ComputerTextGenerator.generate(text[:statusIndex], font, text_color, size, orientation, space_width)
+        imgList.append(imageFirst)
+        #生成手写字符
+        addChar = charList[random.randint(0, 8)]
+        if orientation == 1:
+            raise ValueError("Vertical handwritten text is unavilable!")
+        imgHandWritten = HandwrittenTextGenerator.generate("(" + addChar + ")", text_color)
+        imgList.append(imgHandWritten)
+
+        imageLast = ComputerTextGenerator.generate(text[statusIndex:], font, text_color, size, orientation, space_width)
+        imgList.append(imageLast)
+
+        #将图片合并起来
+        print("iF size:", imageFirst.size,\
+              "iH size:", imgHandWritten.size,\
+              "iL size:", imageLast.size)
+
+
+        # if is_handwritten:
+        #     if orientation == 1:
+        #         raise ValueError("Vertical handwritten text is unavailable")
+        #     image = HandwrittenTextGenerator.generate(text, text_color)
+        # else:
+        #     image = ComputerTextGenerator.generate(text, font, text_color, size, orientation, space_width)
 
         random_angle = random.randint(0-skewing_angle, skewing_angle)
 
