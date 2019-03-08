@@ -1,15 +1,22 @@
 import os
+print(1)
 import pickle
+print(2)
 import numpy as np
 import random
 import tensorflow as tf
+print(3)
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+print(4)
 import matplotlib.mlab as mlab
+print(5)
 import seaborn
+print(6)
 from PIL import Image, ImageColor
+print(7)
 from collections import namedtuple
-
+print("adafdsfasdaffffffffffffffffffffffffffffffffffsdfasdfas")
 class HandwrittenTextGenerator(object):
     @classmethod
     def __sample(cls, e, mu1, mu2, std1, std2, rho):
