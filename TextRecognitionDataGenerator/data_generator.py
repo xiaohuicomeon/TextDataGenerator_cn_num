@@ -50,7 +50,7 @@ class FakeTextDataGenerator(object):
               "iH size:", imgHandWritten.size,\
               "iL size:", imageLast.size)
 
-
+        image = imageLast
         # if is_handwritten:
         #     if orientation == 1:
         #         raise ValueError("Vertical handwritten text is unavailable")
