@@ -121,7 +121,7 @@ class HandwrittenTextGenerator(object):
         with open(os.path.join('handwritten_model', 'translation.pkl'), 'rb') as file:
             translation = pickle.load(file)
 
-        config = tf.ConfigProto(log_device_placement=True, allow_soft_placement=True)
+        config = tf.ConfigProto( allow_soft_placement=True)
         tf.reset_default_graph()
         with tf.Session(config=config) as sess:
             saver = tf.train.import_meta_graph('handwritten_model/model-29.meta')
