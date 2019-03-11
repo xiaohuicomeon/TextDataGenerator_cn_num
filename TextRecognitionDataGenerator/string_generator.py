@@ -16,7 +16,7 @@ def create_strings_from_file(filename, count):
         lines = [l.strip()[0:200] for l in f.readlines()]
         if len(lines) == 0:
             raise Exception("No lines could be read in file")
-        while len(strings) < count: #为了防止line的数量远远小于count，因此这里设置一个while来凑齐count个中文字符串
+        while len(strings) < count:
             if len(lines) >= count - len(strings):
                 strings.extend(lines[0:count - len(strings)])
             else:

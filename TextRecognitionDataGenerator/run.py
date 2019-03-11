@@ -310,32 +310,54 @@ def main():
     string_count = len(strings)
 
     p = Pool(args.thread_count)
-    for _ in tqdm(p.imap_unordered(
-        FakeTextDataGenerator.generate_from_tuple,
-        zip(
-            [i for i in range(0, string_count)],
-            strings,
-            [fonts[random.randrange(0, len(fonts))] for _ in range(0, string_count)],
-            [args.output_dir] * string_count,
-            [args.format] * string_count,
-            [args.extension] * string_count,
-            [args.skew_angle] * string_count,
-            [args.random_skew] * string_count,
-            [args.blur] * string_count,
-            [args.random_blur] * string_count,
-            [args.background] * string_count,
-            [args.distorsion] * string_count,
-            [args.distorsion_orientation] * string_count,
-            [args.handwritten] * string_count,
-            [args.name_format] * string_count,
-            [args.width] * string_count,
-            [args.alignment] * string_count,
-            [args.text_color] * string_count,
-            [args.orientation] * string_count,
-            [args.space_width] * string_count
-        )
-    ), total=args.count):
-        pass
+    # for _ in tqdm(p.imap_unordered(
+        # FakeTextDataGenerator.generate_from_tuple,
+        # zip(
+        #     [i for i in range(0, string_count)],
+        #     strings,
+        #     [fonts[random.randrange(0, len(fonts))] for _ in range(0, string_count)],
+        #     [args.output_dir] * string_count,
+        #     [args.format] * string_count,
+        #     [args.extension] * string_count,
+        #     [args.skew_angle] * string_count,
+        #     [args.random_skew] * string_count,
+        #     [args.blur] * string_count,
+        #     [args.random_blur] * string_count,
+        #     [args.background] * string_count,
+        #     [args.distorsion] * string_count,
+        #     [args.distorsion_orientation] * string_count,
+        #     [args.handwritten] * string_count,
+        #     [args.name_format] * string_count,
+        #     [args.width] * string_count,
+        #     [args.alignment] * string_count,
+        #     [args.text_color] * string_count,
+        #     [args.orientation] * string_count,
+        #     [args.space_width] * string_count
+        # )
+    # ), total=args.count):
+    #     pass
+    FakeTextDataGenerator.generate_from_tuple(
+    zip(
+        [i for i in range(0, string_count)],
+        strings,
+        [fonts[random.randrange(0, len(fonts))] for _ in range(0, string_count)],
+        [args.output_dir] * string_count,
+        [args.format] * string_count,
+        [args.extension] * string_count,
+        [args.skew_angle] * string_count,
+        [args.random_skew] * string_count,
+        [args.blur] * string_count,
+        [args.random_blur] * string_count,
+        [args.background] * string_count,
+        [args.distorsion] * string_count,
+        [args.distorsion_orientation] * string_count,
+        [args.handwritten] * string_count,
+        [args.name_format] * string_count,
+        [args.width] * string_count,
+        [args.alignment] * string_count,
+        [args.text_color] * string_count,
+        [args.orientation] * string_count,
+        [args.space_width] * string_count))
     p.terminate()
 
     if args.name_format == 2:
