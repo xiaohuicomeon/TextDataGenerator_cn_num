@@ -34,57 +34,19 @@ class FakeTextDataGenerator(object):
         ##########################
 
         ##新建状态栏：表明具体添加的位置
-        statusIndex = random.randint(0, len(text))
-        charList = ['a', 'b', 'c', 'd', 'A', 'B', 'C', 'D']
-        imgList = []
-        imageFirst = ComputerTextGenerator.generate(text[:statusIndex] + "(", font, text_color, size, orientation,
-                                                    space_width)
+        addChar = []
+        for i in range(10):
+            charList = ['a', 'b', 'c', 'd', 'A', 'B', 'C', 'D']
+            addChar.append(charList[random.randint(0, 7)])
 
         # 生成手写字符
-        addChar = charList[random.randint(0, 7)]
         if orientation == 1:
             raise ValueError("Vertical handwritten text is unavilable!")
         imgHandWritten = HandwrittenTextGenerator.generate(addChar, text_color)
-        imgHandWritten.save("handwrittenchar.png")
-
-        imageLast = ComputerTextGenerator.generate(")" + text[statusIndex:], font, text_color, size, orientation,
-                                                   space_width)
 
         # 将图片合并起来
-        w_first, h_first = imageFirst.size
-        w_hand, h_hand = imgHandWritten.size
-        w_last, h_last = imageLast.size
+        image = None
 
-        try:
-            if h_first == h_last:
-                imgNewHandWritten = imgHandWritten.resize((math.ceil(w_hand * h_first / h_hand), h_first),
-                                                          Image.ANTIALIAS)
-                imageNewLast = imageLast
-            else:
-                imgNewHandWritten = imgHandWritten.resize((math.ceil(w_hand * h_first / h_hand), h_first),
-                                                          Image.ANTIALIAS)
-                imageNewLast = imageLast.resize((math.ceil(w_last * h_first / h_last), h_first), Image.ANTIALIAS)
-        except Exception:
-
-            raise ValueError
-        finally:
-            print("imageFirst:", imageFirst.getbands(), imageFirst.size)
-            print("imgHandWritten:", imgHandWritten.getbands(), imgNewHandWritten.size)
-            print("imageLast:", imageLast.getbands(), imageNewLast.size)
-
-        to_image = Image.new("RGBA", (w_first + imgNewHandWritten.size[0] + imageNewLast.size[0], h_first))
-        to_image.paste(imageFirst, (0, 0))
-        to_image.paste(imgNewHandWritten, (w_first, 0))
-        to_image.paste(imageNewLast, (w_first + imgNewHandWritten.size[0], 0))
-
-        # if is_handwritten:
-        #     if orientation == 1:
-        #         raise ValueError("Vertical handwritten text is unavailable")
-        #     image = HandwrittenTextGenerator.generate(text, text_color)
-        # else:
-        #     image = ComputerTextGenerator.generate(text, font, text_color, size, orientation, space_width)
-
-        image = to_image
         random_angle = random.randint(0 - skewing_angle, skewing_angle)
         rotated_img = image.rotate(skewing_angle if not random_skew else random_angle, expand=1)
 

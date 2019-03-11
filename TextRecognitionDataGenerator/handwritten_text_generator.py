@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.mlab as mlab
 import seaborn
+import math
 
 os.environ['CUDA_VISIBLE_DEVICES']='0'
 from PIL import Image, ImageColor
@@ -93,28 +94,28 @@ class HandwrittenTextGenerator(object):
     def __crop_white_borders(cls, image):
         image_data = np.asarray(image)
         grey_image_data = np.asarray(image.convert('L'))
-        non_empty_columns = np.where(grey_image_data.min(axis=0) < 255)[0]
+        non_empty_columns = np.where(grey_image_data.min(axis=0) < 255)[0]#np.where会输出两个array，一个记录x坐标，一个记录y坐标，这里只是取出了x坐标
         non_empty_rows = np.where(grey_image_data.min(axis=1) < 255)[0]
+        print(non_empty_rows.shape)
         cropBox = (min(non_empty_rows), max(non_empty_rows), min(non_empty_columns), max(non_empty_columns))
         image_data_new = image_data[cropBox[0]:cropBox[1]+1, cropBox[2]:cropBox[3]+1, :]
 
         return Image.fromarray(image_data_new)
 
     @classmethod
-    def __join_images(cls, images):
-        widths, heights = zip(*(i.size for i in images))
-
-        total_width = sum(widths) - 35 * len(images)
-        max_height = max(heights)
-
-        compound_image = Image.new('RGBA', (total_width, max_height))
+    def __join_images(cls, images, rows, standHeight=64):
+        assert len(images) == len(rows)
+        total_width = sum(rows)
+        compound_image = Image.new('RGBA', (total_width, standHeight))
 
         x_offset = 0
-        for im in images:
+        for i in range(len(rows)):
+            im = images[i]
+            width = rows[i]
             compound_image.paste(im, (x_offset,0))
-            x_offset += (im.size[0] - 35)
+            x_offset += width
 
-        return compound_image
+        return compound_image, rows
 
     @classmethod
     def generate(cls, text, text_color):
@@ -127,6 +128,8 @@ class HandwrittenTextGenerator(object):
             saver = tf.train.import_meta_graph('handwritten_model/model-29.meta')
             saver.restore(sess, 'handwritten_model/model-29')
             images = []
+            rows = []
+            standHeight = 64
             colors = [ImageColor.getrgb(c) for c in text_color.split(',')]
             c1, c2 = colors[0], colors[-1]
 
@@ -136,7 +139,7 @@ class HandwrittenTextGenerator(object):
                 random.randint(min(c1[2], c2[2]), max(c1[2], c2[2]))
             )
 
-            for word in text.split(' '):
+            for word in text:
                 _, window_data, kappa_data, stroke_data, coords = cls.__sample_text(sess, word, translation)
 
                 strokes = np.array(stroke_data)
@@ -158,8 +161,13 @@ class HandwrittenTextGenerator(object):
                 canvas.draw()
 
                 image = Image.frombytes('RGBA', canvas.get_width_height(), canvas.buffer_rgba())
-                images.append(cls.__crop_white_borders(image))
 
+                #将所有生成的图片全部resize为（，64）
+                image = cls.__crop_white_borders(image) #会导致这张图片只是保留有墨迹的位置
+                w, h = image.size
+                resize_w = math.ceil(w*64/h)
+                images.append(image.resize(resize_w, 64), Image.ANTIALIAS)
+                rows.append(resize_w)
                 plt.close()
 
-            return cls.__join_images(images)
+            return cls.__join_images(images, rows, standHeight)
