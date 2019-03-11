@@ -5,12 +5,14 @@ import math
 from PIL import Image, ImageFilter
 
 from computer_text_generator import ComputerTextGenerator
+
 try:
     from handwritten_text_generator import HandwrittenTextGenerator
 except ImportError as e:
     print('Missing modules for handwritten text generation.')
 from background_generator import BackgroundGenerator
 from distorsion_generator import DistorsionGenerator
+
 
 class FakeTextDataGenerator(object):
     @classmethod
@@ -22,7 +24,9 @@ class FakeTextDataGenerator(object):
             cls.generate(*i)
 
     @classmethod
-    def generate(cls, index, text, font, out_dir, size, extension, skewing_angle, random_skew, blur, random_blur, background_type, distorsion_type, distorsion_orientation, is_handwritten, name_format, width, alignment, text_color, orientation, space_width):
+    def generate(cls, index, text, font, out_dir, size, extension, skewing_angle, random_skew, blur, random_blur,
+                 background_type, distorsion_type, distorsion_orientation, is_handwritten, name_format, width,
+                 alignment, text_color, orientation, space_width):
         image = None
 
         ##########################
@@ -33,29 +37,32 @@ class FakeTextDataGenerator(object):
         statusIndex = random.randint(0, len(text))
         charList = ['a', 'b', 'c', 'd', 'A', 'B', 'C', 'D']
         imgList = []
-        imageFirst = ComputerTextGenerator.generate(text[:statusIndex]+"(", font, text_color, size, orientation, space_width)
+        imageFirst = ComputerTextGenerator.generate(text[:statusIndex] + "(", font, text_color, size, orientation,
+                                                    space_width)
 
-        #生成手写字符
+        # 生成手写字符
         addChar = charList[random.randint(0, 7)]
         if orientation == 1:
             raise ValueError("Vertical handwritten text is unavilable!")
         imgHandWritten = HandwrittenTextGenerator.generate(addChar, text_color)
         imgHandWritten.save("handwrittenchar.png")
 
+        imageLast = ComputerTextGenerator.generate(")" + text[statusIndex:], font, text_color, size, orientation,
+                                                   space_width)
 
-        imageLast = ComputerTextGenerator.generate(")"+text[statusIndex:], font, text_color, size, orientation, space_width)
-
-        #将图片合并起来
+        # 将图片合并起来
         w_first, h_first = imageFirst.size
         w_hand, h_hand = imgHandWritten.size
         w_last, h_last = imageLast.size
 
         try:
             if h_first == h_last:
-                imgNewHandWritten = imgHandWritten.resize((math.ceil(w_hand * h_first / h_hand), h_first), Image.ANTIALIAS)
+                imgNewHandWritten = imgHandWritten.resize((math.ceil(w_hand * h_first / h_hand), h_first),
+                                                          Image.ANTIALIAS)
                 imageNewLast = imageLast
             else:
-                imgNewHandWritten = imgHandWritten.resize((math.ceil(w_hand * h_first / h_hand), h_first), Image.ANTIALIAS)
+                imgNewHandWritten = imgHandWritten.resize((math.ceil(w_hand * h_first / h_hand), h_first),
+                                                          Image.ANTIALIAS)
                 imageNewLast = imageLast.resize((math.ceil(w_last * h_first / h_last), h_first), Image.ANTIALIAS)
         except Exception:
 
@@ -65,13 +72,10 @@ class FakeTextDataGenerator(object):
             print("imgHandWritten:", imgHandWritten.getbands(), imgNewHandWritten.size)
             print("imageLast:", imageLast.getbands(), imageNewLast.size)
 
-        to_image = Image.new("RGBA", (w_first+imgNewHandWritten.size[0]+imageNewLast.size[0], h_first))
-        to_image.paste(imageFirst, (0,0))
-        to_image.paste(imgNewHandWritten, (w_first,0))
-        to_image.paste(imageNewLast, (w_first+imgNewHandWritten.size[0],0))
-
-
-
+        to_image = Image.new("RGBA", (w_first + imgNewHandWritten.size[0] + imageNewLast.size[0], h_first))
+        to_image.paste(imageFirst, (0, 0))
+        to_image.paste(imgNewHandWritten, (w_first, 0))
+        to_image.paste(imageNewLast, (w_first + imgNewHandWritten.size[0], 0))
 
         # if is_handwritten:
         #     if orientation == 1:
@@ -81,14 +85,14 @@ class FakeTextDataGenerator(object):
         #     image = ComputerTextGenerator.generate(text, font, text_color, size, orientation, space_width)
 
         image = to_image
-        random_angle = random.randint(0-skewing_angle, skewing_angle)
+        random_angle = random.randint(0 - skewing_angle, skewing_angle)
         rotated_img = image.rotate(skewing_angle if not random_skew else random_angle, expand=1)
 
         #############################
         # Apply distorsion to image #
         #############################
         if distorsion_type == 0:
-            distorted_img = rotated_img # Mind = blown
+            distorted_img = rotated_img  # Mind = blown
         elif distorsion_type == 1:
             distorted_img = DistorsionGenerator.sin(
                 rotated_img,
@@ -162,20 +166,20 @@ class FakeTextDataGenerator(object):
             )
         )
 
-    # #####################################
-    # # Generate name for resulting image #
-    # #####################################
+        # #####################################
+        # # Generate name for resulting image #
+        # #####################################
         if name_format == 0:
             image_name = '{}_{}.{}'.format(text, str(index), extension)
         elif name_format == 1:
             image_name = '{}_{}.{}'.format(str(index), text, extension)
         elif name_format == 2:
-            image_name = '{}.{}'.format(str(index),extension)
+            image_name = '{}.{}'.format(str(index), extension)
         else:
             print('{} is not a valid name format. Using default.'.format(name_format))
             image_name = '{}_{}.{}'.format(text, str(index), extension)
 
-    # # Save the image
+        # # Save the image
         final_image.convert('RGB').save(os.path.join(out_dir, image_name))
-        #to_image.convert("RGB").save(os.path.join(out_dir, image_name))
-        imgHandWritten.convert("RGB").save(os.path.join(out_dir, "handChar"+image_name))
+        # to_image.convert("RGB").save(os.path.join(out_dir, image_name))
+        imgHandWritten.convert("RGB").save(os.path.join(out_dir, "handChar" + image_name))
