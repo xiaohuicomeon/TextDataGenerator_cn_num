@@ -133,15 +133,6 @@ class FakeTextDataGenerator(object):
         # #####################################
         # # Generate name for resulting image #
         # #####################################
-        if name_format == 0:
-            image_name = '{}_{}.{}'.format(text, str(index), extension)
-        elif name_format == 1:
-            image_name = '{}_{}.{}'.format(str(index), text, extension)
-        elif name_format == 2:
-            image_name = '{}.{}'.format(str(index), extension)
-        else:
-            print('{} is not a valid name format. Using default.'.format(name_format))
-            image_name = '{}_{}.{}'.format(text, str(index), extension)
 
         # # Save the image
         if os.path.exists("handChars"):
@@ -152,4 +143,5 @@ class FakeTextDataGenerator(object):
         for i in range(len(Rows)):
             w = Rows[i]
             Image.fromarray(final_image[beginCols:beginCols+w,:,:]).convert("RGB").save("handChars/"+str(i)+".jpg")
+            beginCols += w
 
