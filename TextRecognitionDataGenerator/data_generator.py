@@ -2,6 +2,7 @@ import os
 import random
 import math
 import shutil
+import numpy as np
 
 from PIL import Image, ImageFilter
 
@@ -147,7 +148,8 @@ class FakeTextDataGenerator(object):
             shutil.rmtree("handChars")
         os.mkdir("handChars")
         beginCols = 0
+        final_image = np.array(final_image)
         for i in range(len(Rows)):
             w = Rows[i]
-            final_image[beginCols:beginCols+w,:,:].convert("RGB").save("handChars/"+str(i)+".jpg")
+            Image.fromarray(final_image[beginCols:beginCols+w,:,:]).convert("RGB").save("handChars/"+str(i)+".jpg")
 

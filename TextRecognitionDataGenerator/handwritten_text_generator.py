@@ -96,7 +96,6 @@ class HandwrittenTextGenerator(object):
         grey_image_data = np.asarray(image.convert('L'))
         non_empty_columns = np.where(grey_image_data.min(axis=0) < 255)[0]#np.where会输出两个array，一个记录x坐标，一个记录y坐标，这里只是取出了x坐标
         non_empty_rows = np.where(grey_image_data.min(axis=1) < 255)[0]
-        print(non_empty_rows.shape)
         cropBox = (min(non_empty_rows), max(non_empty_rows), min(non_empty_columns), max(non_empty_columns))
         image_data_new = image_data[cropBox[0]:cropBox[1]+1, cropBox[2]:cropBox[3]+1, :]
 
@@ -166,7 +165,7 @@ class HandwrittenTextGenerator(object):
                 image = cls.__crop_white_borders(image) #会导致这张图片只是保留有墨迹的位置
                 w, h = image.size
                 resize_w = math.ceil(w*64/h)
-                images.append(image.resize(resize_w, 64), Image.ANTIALIAS)
+                images.append(image.resize((resize_w, 64), Image.ANTIALIAS))
                 rows.append(resize_w)
                 plt.close()
 
