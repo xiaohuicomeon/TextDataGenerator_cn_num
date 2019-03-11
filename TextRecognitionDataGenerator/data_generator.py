@@ -17,7 +17,6 @@ class FakeTextDataGenerator(object):
         """
             Same as generate, but takes all parameters as one tuple
         """
-
         cls.generate(*t)
 
     @classmethod
@@ -31,26 +30,22 @@ class FakeTextDataGenerator(object):
         ##新建状态栏：表明具体添加的位置
         statusIndex = random.randint(0, len(text))
         charList = ['a', 'b', 'c', 'd', 'A', 'B', 'C', 'D']
-        imgList = []
+        #生成手写字符列表
+        num = 200
+        addCharList = []
+        for i in range(num):
+            addChar = charList[random.randint(0, 8)]
+            addCharList.append(addChar)
 
-        imageFirst = ComputerTextGenerator.generate(text[:statusIndex], font, text_color, size, orientation, space_width)
-        imgList.append(imageFirst)
-        #生成手写字符
-        addChar = charList[random.randint(0, 8)]
         if orientation == 1:
             raise ValueError("Vertical handwritten text is unavilable!")
-        imgHandWritten = HandwrittenTextGenerator.generate("( " + addChar + " )", text_color)
-        imgList.append(imgHandWritten)
+        imgHandWritten = HandwrittenTextGenerator.generate(addCharList, text_color)
 
-        imageLast = ComputerTextGenerator.generate(text[statusIndex:], font, text_color, size, orientation, space_width)
-        imgList.append(imageLast)
-
+        return
         #将图片合并起来
-        print("iF size:", imageFirst.size,\
-              "iH size:", imgHandWritten.size,\
-              "iL size:", imageLast.size)
 
-        image = imageLast
+        image = imgHandWritten
+
         # if is_handwritten:
         #     if orientation == 1:
         #         raise ValueError("Vertical handwritten text is unavailable")
