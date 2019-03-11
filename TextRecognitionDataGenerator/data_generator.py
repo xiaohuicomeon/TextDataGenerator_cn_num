@@ -1,6 +1,7 @@
 import os
 import random
 import math
+import shutil
 
 from PIL import Image, ImageFilter
 
@@ -42,10 +43,10 @@ class FakeTextDataGenerator(object):
         # 生成手写字符
         if orientation == 1:
             raise ValueError("Vertical handwritten text is unavilable!")
-        imgHandWritten = HandwrittenTextGenerator.generate(addChar, text_color)
+        imgHandWritten, Rows = HandwrittenTextGenerator.generate(addChar, text_color)
 
         # 将图片合并起来
-        image = None
+        image = imgHandWritten
 
         random_angle = random.randint(0 - skewing_angle, skewing_angle)
         rotated_img = image.rotate(skewing_angle if not random_skew else random_angle, expand=1)
@@ -142,6 +143,11 @@ class FakeTextDataGenerator(object):
             image_name = '{}_{}.{}'.format(text, str(index), extension)
 
         # # Save the image
-        final_image.convert('RGB').save(os.path.join(out_dir, image_name))
-        # to_image.convert("RGB").save(os.path.join(out_dir, image_name))
-        imgHandWritten.convert("RGB").save(os.path.join(out_dir, "handChar" + image_name))
+        if os.path.exists("handChars"):
+            shutil.rmtree("handChars")
+        os.mkdir("handChars")
+        beginCols = 0
+        for i in range(len(Rows)):
+            w = Rows[i]
+            final_image[beginCols:beginCols+w,:,:].convert("RGB").save("handChars/"+str(i)+".jpg")
+

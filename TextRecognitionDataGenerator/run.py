@@ -307,7 +307,7 @@ def main():
         strings = create_strings_from_dict(args.length, args.random, args.count, lang_dict)
 
 
-    string_count = len(strings)
+    string_count = 1
 
     p = Pool(args.thread_count)
     # for _ in tqdm(p.imap_unordered(
