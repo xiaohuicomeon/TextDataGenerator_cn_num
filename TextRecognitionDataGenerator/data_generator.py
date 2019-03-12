@@ -37,7 +37,7 @@ class FakeTextDataGenerator(object):
 
         ##新建状态栏：表明具体添加的位置
         addChar = []
-        for i in range(10):
+        for i in range(1000):
             charList = ['a', 'b', 'c', 'd', 'A', 'B', 'C', 'D']
             addChar.append(charList[random.randint(0, 7)])
 
@@ -45,103 +45,102 @@ class FakeTextDataGenerator(object):
         if orientation == 1:
             raise ValueError("Vertical handwritten text is unavilable!")
         imgHandWritten, Rows = HandwrittenTextGenerator.generate(addChar, text_color)
+        assert len(imgHandWritten) == len(Rows)
 
-        # 将图片合并起来
-        image = imgHandWritten
-
-        random_angle = random.randint(0 - skewing_angle, skewing_angle)
-        rotated_img = image.rotate(skewing_angle if not random_skew else random_angle, expand=1)
-
-        #############################
-        # Apply distorsion to image #
-        #############################
-        if distorsion_type == 0:
-            distorted_img = rotated_img  # Mind = blown
-        elif distorsion_type == 1:
-            distorted_img = DistorsionGenerator.sin(
-                rotated_img,
-                vertical=(distorsion_orientation == 0 or distorsion_orientation == 2),
-                horizontal=(distorsion_orientation == 1 or distorsion_orientation == 2)
-            )
-        elif distorsion_type == 2:
-            distorted_img = DistorsionGenerator.cos(
-                rotated_img,
-                vertical=(distorsion_orientation == 0 or distorsion_orientation == 2),
-                horizontal=(distorsion_orientation == 1 or distorsion_orientation == 2)
-            )
-        else:
-            distorted_img = DistorsionGenerator.random(
-                rotated_img,
-                vertical=(distorsion_orientation == 0 or distorsion_orientation == 2),
-                horizontal=(distorsion_orientation == 1 or distorsion_orientation == 2)
-            )
-
-        ##################################
-        # Resize image to desired format #
-        ##################################
-
-        # Horizontal text
-        if orientation == 0:
-            new_width = int(float(distorted_img.size[0] + 10) * (float(size) / float(distorted_img.size[1] + 10)))
-            resized_img = distorted_img.resize((new_width, size - 10), Image.ANTIALIAS)
-            background_width = width if width > 0 else new_width + 10
-            background_height = size
-        # Vertical text
-        elif orientation == 1:
-            new_height = int(float(distorted_img.size[1] + 10) * (float(size) / float(distorted_img.size[0] + 10)))
-            resized_img = distorted_img.resize((size - 10, new_height), Image.ANTIALIAS)
-            background_width = size
-            background_height = new_height + 10
-        else:
-            raise ValueError("Invalid orientation")
-
-        #############################
-        # Generate background image #
-        #############################
-        if background_type == 0:
-            background = BackgroundGenerator.gaussian_noise(background_height, background_width)
-        elif background_type == 1:
-            background = BackgroundGenerator.plain_white(background_height, background_width)
-        elif background_type == 2:
-            background = BackgroundGenerator.quasicrystal(background_height, background_width)
-        else:
-            background = BackgroundGenerator.picture(background_height, background_width)
-
-        #############################
-        # Place text with alignment #
-        #############################
-
-        new_text_width, _ = resized_img.size
-
-        if alignment == 0:
-            background.paste(resized_img, (5, 5), resized_img)
-        elif alignment == 1:
-            background.paste(resized_img, (int(background_width / 2 - new_text_width / 2), 5), resized_img)
-        else:
-            background.paste(resized_img, (background_width - new_text_width - 5, 5), resized_img)
-
-        ##################################
-        # Apply gaussian blur #
-        ##################################
-
-        final_image = background.filter(
-            ImageFilter.GaussianBlur(
-                radius=(blur if not random_blur else random.randint(0, blur))
-            )
-        )
-
-        # #####################################
-        # # Generate name for resulting image #
-        # #####################################
-
-        # # Save the image
         if os.path.exists("handChars"):
             shutil.rmtree("handChars")
         os.mkdir("handChars")
-        beginCols = 0
-        final_image = np.array(final_image)
+
+        # 将图片合并起来
         for i in range(len(Rows)):
-            w = Rows[i]
-            Image.fromarray(final_image[beginCols:beginCols+w,:,:]).convert("RGB").save("handChars/"+str(i)+".jpg")
-            beginCols += w
+            image = imgHandWritten[i]
+            #print("51", image.size)
+            random_angle = random.randint(0 - skewing_angle, skewing_angle)
+            rotated_img = image.rotate(skewing_angle if not random_skew else random_angle, expand=1)
+            #print("54rotate", rotated_img.size)
+            #############################
+            # Apply distorsion to image #
+            #############################
+
+            if distorsion_type == 0:
+                distorted_img = rotated_img  # Mind = blown
+            elif distorsion_type == 1:
+                distorted_img = DistorsionGenerator.sin(
+                    rotated_img,
+                    vertical=(distorsion_orientation == 0 or distorsion_orientation == 2),
+                    horizontal=(distorsion_orientation == 1 or distorsion_orientation == 2)
+                )
+            elif distorsion_type == 2:
+                distorted_img = DistorsionGenerator.cos(
+                    rotated_img,
+                    vertical=(distorsion_orientation == 0 or distorsion_orientation == 2),
+                    horizontal=(distorsion_orientation == 1 or distorsion_orientation == 2)
+                )
+            else:
+                distorted_img = DistorsionGenerator.random(
+                    rotated_img,
+                    vertical=(distorsion_orientation == 0 or distorsion_orientation == 2),
+                    horizontal=(distorsion_orientation == 1 or distorsion_orientation == 2)
+                )
+            #print("78distorted_img", distorted_img.size)
+            ##################################
+            # Resize image to desired format #
+            ##################################
+
+            # Horizontal text
+            if orientation == 0:
+                new_width = int(float(distorted_img.size[0] + 10) * (float(size) / float(distorted_img.size[1] + 10)))
+                resized_img = distorted_img.resize((new_width, size - 10), Image.ANTIALIAS)
+                background_width = width if width > 0 else new_width + 10
+                background_height = size
+            # Vertical text
+            elif orientation == 1:
+                new_height = int(float(distorted_img.size[1] + 10) * (float(size) / float(distorted_img.size[0] + 10)))
+                resized_img = distorted_img.resize((size - 10, new_height), Image.ANTIALIAS)
+                background_width = size
+                background_height = new_height + 10
+            else:
+                raise ValueError("Invalid orientation")
+            print("97orientation", resized_img.size)
+            #############################
+            # Generate background image #
+            #############################
+            if background_type == 0:
+                background = BackgroundGenerator.gaussian_noise(background_height, background_width)
+            elif background_type == 1:
+                background = BackgroundGenerator.plain_white(background_height, background_width)
+            elif background_type == 2:
+                background = BackgroundGenerator.quasicrystal(background_height, background_width)
+            else:
+                background = BackgroundGenerator.picture(background_height, background_width)
+
+            #############################
+            # Place text with alignment #
+            #############################
+
+            new_text_width, _ = resized_img.size
+
+            if alignment == 0:
+                background.paste(resized_img, (5, 5), resized_img)
+            elif alignment == 1:
+                background.paste(resized_img, (int(background_width / 2 - new_text_width / 2), 5), resized_img)
+            else:
+                background.paste(resized_img, (background_width - new_text_width - 5, 5), resized_img)
+            #print("122background", background.size)
+            ##################################
+            # Apply gaussian blur #
+            ##################################
+
+            final_image = background.filter(
+                ImageFilter.GaussianBlur(
+                    radius=(blur if not random_blur else random.randint(0, blur))
+                )
+            )
+            #print("132final_image", final_image.size)
+            # #####################################
+            # # Generate name for resulting image #
+            # #####################################
+
+            # # Save the image
+            final_image.convert("RGB").save("handChars/"+addChar[i]+"_"+str(i)+".jpg")
 

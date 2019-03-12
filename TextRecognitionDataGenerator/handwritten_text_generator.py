@@ -168,5 +168,5 @@ class HandwrittenTextGenerator(object):
                 images.append(image.resize((resize_w, 64), Image.ANTIALIAS))
                 rows.append(resize_w)
                 plt.close()
-
-            return cls.__join_images(images, rows, standHeight)
+            return images, rows
+            #return cls.__join_images(images, rows, standHeight)
